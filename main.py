@@ -45,7 +45,9 @@ class MyMath:
 
         @self.myRouter.get("/params")
         async def params():
-            return map(lambda x: Param(x).name, filter(lambda x: isinstance(x, Param), self.expressions))
+            es = self.expressions
+            filter(lambda x: isinstance(x, Param), es)
+            return map(lambda x: Param(x).name, es)
 
         @self.myRouter.post("/add_val_{e}")
         async def add_val(e):
