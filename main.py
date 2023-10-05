@@ -2,29 +2,24 @@ from fastapi import APIRouter, FastAPI
 from pydantic import BaseModel
 
 
-class d(BaseModel):
-    def __init__(self, m: dict[str, float], *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.m = m;
-
 class Expr:
     def evaluate(self, values):
         raise NotImplementedError("Please Implement this method")
 
 
 class Param(Expr):
-    def __init__(self, name):
+    def __init__(self, name: str):
         self.name = name
 
-    def evaluate(self, values):
+    def evaluate(self, values: dict[str, float]):
         return values[self.name]
 
 
 class Value(Expr):
-    def __init__(self, val):
+    def __init__(self, val: float):
         self.val = val
 
-    def evaluate(self, values):
+    def evaluate(self, values: dict[str, float]):
         return self.val
 
 
@@ -45,21 +40,19 @@ class MyMath:
 
         @self.myRouter.get("/params")
         async def params():
-            es = self.expressions
-            filter(lambda x: isinstance(x, Param), es)
-            return map(lambda x: Param(x).name, es)
+            return list(map(lambda x: x.name, filter(lambda x: isinstance(x, Param), self.expressions)))
 
         @self.myRouter.post("/add_val_{e}")
         async def add_val(e):
             self.expressions.append(Value(e))
 
         @self.myRouter.post("/add_par_{e}")
-        async def add_val(e):
+        async def add_par(e):
             self.expressions.append(Param(e))
 
         @self.myRouter.post("/eval")
-        async def evaluate(m: d):
-            return sum(map(lambda x: x.evaluate(m), self.expressions))
+        async def evaluate(d: dict[str, float]):
+            return sum(map(lambda x: x.evaluate(d), self.expressions))
 
 
 app = FastAPI()
