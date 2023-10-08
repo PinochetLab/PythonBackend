@@ -16,10 +16,10 @@ class Param(Expr):
 
 
 class Value(Expr):
-    def __init__(self, val: float):
+    def __init__(self, val: int):
         self.val = val
 
-    def evaluate(self, values: dict[str, float]):
+    def evaluate(self, values: dict[str, int]):
         return self.val
 
 
@@ -34,24 +34,20 @@ class MyMath:
         async def root():
             return {"message": "Hello World"}
 
-        @self.myRouter.get("/items/{item_id}")
-        async def read_item(item_id: int, q: str = None):
-            return {"item_id": item_id, "q": q}
-
         @self.myRouter.get("/params")
         async def params():
             return list(map(lambda x: x.name, filter(lambda x: isinstance(x, Param), self.expressions)))
 
         @self.myRouter.post("/add_val_{e}")
         async def add_val(e):
-            self.expressions.append(Value(e))
+            self.expressions.append(Value(int(e)))
 
         @self.myRouter.post("/add_par_{e}")
         async def add_par(e):
             self.expressions.append(Param(e))
 
         @self.myRouter.post("/eval")
-        async def evaluate(d: dict[str, float]):
+        async def evaluate(d: dict[str, int]):
             return sum(map(lambda x: x.evaluate(d), self.expressions))
 
 
